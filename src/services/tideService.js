@@ -1,12 +1,14 @@
 import axios from 'axios';
+import { getCachedData, setCachedData } from './cacheService';
 
-const API_KEY = '6208ad9cd9e7403c97434a2a74a850ba'; // Replace with actual key
-const API_HOST = 'https://mu2k5nhkw8.re.qweatherapi.com'; // IMPORTANT: Replace with your dedicated API Host (e.g., https://api-xxxx.qweather.com)
+const API_KEY = import.meta.env.VITE_QWEATHER_API_KEY;
+const API_HOST = import.meta.env.VITE_QWEATHER_API_HOST;
 const TIDE_BASE_URL = `${API_HOST}/v7/ocean/tide`;
 const GEO_BASE_URL = `${API_HOST}/geo/v2/poi/lookup`;
 
 export const getTideData = async (lng, lat, date) => {
     console.log(`[TideService] getTideData called with: lng=${lng}, lat=${lat}, date=${date}`);
+
     try {
         // Step 1: Find the nearest tide station (POI type: TSTA)
         console.log(`[TideService] Requesting POI Lookup: ${GEO_BASE_URL}?location=${lng},${lat}&type=TSTA`);
@@ -29,7 +31,17 @@ export const getTideData = async (lng, lat, date) => {
         const stationName = poiResponse.data.poi[0].name;
         console.log(`[TideService] Found tide station: ${stationName} (${stationId})`);
 
-        // Step 2: Get tide data for the station
+        // Generate cache key based on station ID and date
+        const cacheKey = `${stationId}_${date}`;
+
+        // Step 2: Check cache first
+        const cachedData = getCachedData(cacheKey);
+        if (cachedData) {
+            console.log('[TideService] Returning cached tide data');
+            return cachedData;
+        }
+
+        // Step 3: Get tide data for the station from API
         console.log(`[TideService] Requesting Tide Data: ${TIDE_BASE_URL}?location=${stationId}&date=${date}`);
         const tideResponse = await axios.get(TIDE_BASE_URL, {
             params: {
@@ -45,6 +57,9 @@ export const getTideData = async (lng, lat, date) => {
             console.error(`[TideService] Failed to fetch tide data. Code: ${tideResponse.data.code}`);
             throw new Error(`Failed to fetch tide data. Code: ${tideResponse.data.code}`);
         }
+
+        // Step 4: Cache the successful response
+        setCachedData(cacheKey, tideResponse.data);
 
         return tideResponse.data;
 

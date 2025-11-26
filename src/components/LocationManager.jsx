@@ -8,7 +8,7 @@ const LocationManager = ({ onLocationSelect }) => {
 
   useEffect(() => {
     AMapLoader.load({
-      key: '9054e96c6d799794f0757caf5808a2df', // Replace with your actual API Key
+      key: import.meta.env.VITE_AMAP_API_KEY,
       version: '2.0',
       plugins: ['AMap.Geolocation', 'AMap.Geocoder'],
     })
@@ -50,7 +50,7 @@ const LocationManager = ({ onLocationSelect }) => {
     if (!map) return;
 
     AMapLoader.load({
-      key: '9054e96c6d799794f0757caf5808a2df',
+      key: import.meta.env.VITE_AMAP_API_KEY,
       version: '2.0',
       plugins: ['AMap.Geolocation'],
     }).then((AMap) => {
