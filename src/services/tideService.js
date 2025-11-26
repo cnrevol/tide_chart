@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const API_KEY = '6208ad9cd9e7403c97434a2a74a850ba'; // Replace with actual key
-const TIDE_BASE_URL = 'https://devapi.qweather.com/v7/ocean/tide';
-const GEO_BASE_URL = 'https://geoapi.qweather.com/geo/v2/poi/lookup';
+const API_HOST = 'https://mu2k5nhkw8.re.qweatherapi.com'; // IMPORTANT: Replace with your dedicated API Host (e.g., https://api-xxxx.qweather.com)
+const TIDE_BASE_URL = `${API_HOST}/v7/ocean/tide`;
+const GEO_BASE_URL = `${API_HOST}/geo/v2/poi/lookup`;
 
 export const getTideData = async (lng, lat, date) => {
     console.log(`[TideService] getTideData called with: lng=${lng}, lat=${lat}, date=${date}`);
